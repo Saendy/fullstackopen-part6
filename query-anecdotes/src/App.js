@@ -2,9 +2,13 @@ import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { getAnecdotes, updateAnecdote } from './requests'
+import NotificationContext from './NotificationContext'
+import { useContext } from 'react'
 
 
 const App = () => {
+
+  const [notification, notificationDispatch] = useContext(NotificationContext)
 
   const result = useQuery(
     'anecdotes',
@@ -19,6 +23,8 @@ const App = () => {
       const anecdotes = queryClient.getQueryData('anecdotes')
       anecdotes[anecdotes.findIndex(anecdote => anecdote.id === updateAnecdote.id)].votes++
       queryClient.setQueryData('anecdotes', anecdotes)
+      notificationDispatch({ type: 'SET', payload: `anecdote '${updateAnecdote.content}' voted` })
+      setTimeout(() => notificationDispatch({ type: 'CLEAR' }), 5000)
     }
   })
 
